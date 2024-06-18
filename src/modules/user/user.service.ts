@@ -64,11 +64,22 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
 
+    const updatedData = {
+      ...updateUserDto,
+      updatedAt: new Date(),
+    };
+
+    if (updateUserDto.password) {
+      const salt = await bcrypt.genSalt();
+      const hashedPassword = await bcrypt.hash(updateUserDto.password, salt);
+      updatedData.password = hashedPassword;
+    }
+
     return this.prisma.user.update({
       where: {
         id,
       },
-      data: updateUserDto,
+      data: updatedData,
     });
   }
 
