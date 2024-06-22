@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { Role } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -13,7 +14,7 @@ import { User } from './entities/user.entity';
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async create(createUserDto: CreateUserDto, userRole: Role): Promise<User> {
     const userExists = await this.prisma.user.findUnique({
       where: {
         email: createUserDto.email,
@@ -27,22 +28,44 @@ export class UserService {
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
 
-    return this.prisma.user.create({
+    return await this.prisma.user.create({
       data: {
         ...createUserDto,
+        role: userRole,
         password: hashedPassword,
       },
     });
   }
 
   async findAll(): Promise<User[]> {
-    return await this.prisma.user.findMany();
+    return await this.prisma.user.findMany({
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        password: true,
+        role: true,
+        createdAt: false,
+        updatedAt: false,
+      },
+    });
   }
 
   async findOne(id: string): Promise<User> {
     const user = await this.prisma.user.findUnique({
       where: {
         id,
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        password: true,
+        role: true,
+        createdAt: false,
+        updatedAt: false,
       },
     });
 

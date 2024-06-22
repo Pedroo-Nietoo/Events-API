@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { $Enums, Prisma } from '@prisma/client';
 
 export class User implements Prisma.UserCreateInput {
   id?: string;
@@ -6,6 +6,7 @@ export class User implements Prisma.UserCreateInput {
   lastName: string;
   email: string;
   password: string;
+  role?: $Enums.Role;
   createdAt?: Date | string;
   updatedAt?: Date | string;
 }

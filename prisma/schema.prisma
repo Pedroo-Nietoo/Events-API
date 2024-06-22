@@ -13,10 +13,16 @@ model User {
   lastName  String    @map("last_name")
   email     String    @unique
   password  String
+  role      Role      @default(User)
   createdAt DateTime? @default(now()) @map("created_at")
   updatedAt DateTime? @default(now()) @map("updated_at")
 
   @@map("users")
+}
+
+enum Role {
+  User
+  Admin
 }
 
 model Event {
